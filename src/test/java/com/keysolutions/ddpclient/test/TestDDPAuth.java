@@ -17,6 +17,11 @@
 package com.keysolutions.ddpclient.test;
 
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.keysolutions.ddpclient.DDPClient;
@@ -175,7 +180,7 @@ public class TestDDPAuth extends TestCase {
      * @throws Exception
      */
     public void testLogin() throws Exception {
-        //TODO: does this belong inside the DDP client?
+        //TODO: does this belong inside the Java DDP client?
         //// test out regular login
         // create DDP client instance and hook testobserver to it
         DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
@@ -233,6 +238,74 @@ public class TestDDPAuth extends TestCase {
         assertTrue(obs.mCollections.get("users").size() == 1);
     }
     
+    /**
+     * Tests that we can create a user and log in
+     * @throws URISyntaxException 
+     * @throws InterruptedException 
+     */
+    @SuppressWarnings("unchecked")
+    public void testCreateUser() throws URISyntaxException, InterruptedException {
+        //TODO: does this belong inside the Java DDP client?
+        // create DDP client instance and hook testobserver to it
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPTestClientObserver obs = new DDPTestClientObserver();
+        ddp.addObserver(obs);                    
+        // make connection to Meteor server
+        ddp.connect();          
+
+        // we need to wait a bit before the socket is opened but make sure it's successful
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Connected);
+        
+        // subscribe to user collection
+        ddp.subscribe("users", new Object[] {});
+        
+        // delete old user first in case this test has been run before
+        Object[] methodArgs = new Object[1];
+        methodArgs[0] = "test2@test.com";
+        ddp.call("deleteUser", methodArgs, obs);
+        
+        // we need to wait a bit in case there was a deletion
+        Thread.sleep(500);
+
+        // make sure user doesn't exist
+        Map<String, Object> userColl = obs.mCollections.get("users");
+        assertNotNull(userColl);
+        boolean foundUser = false;
+        for (Entry<String, Object> entry : userColl.entrySet()) {
+            Map<String, Object> fields = (Map<String, Object>) entry.getValue();
+            ArrayList<Map<String,Object>> emails = (ArrayList<Map<String, Object>>) fields.get("emails");
+            assertFalse(emails.get(0).get("address").equals("test2@test.com"));
+        }
+        
+        // create new user
+        Map<String,Object> options = new HashMap<String,Object>();
+        methodArgs[0] = options;
+        options.put("username", "test2@test.com");
+        options.put("email", "test2@test.com");
+        options.put("password", "1234");
+        ddp.call("createUser", methodArgs);
+        
+        // we need to wait a bit for the insertion or error
+        Thread.sleep(500);
+        
+        // make sure we have no errors
+        assertEquals(0, obs.mErrorCode);
+        
+        // check that users collection has this user
+        userColl = obs.mCollections.get("users");
+        assertNotNull(userColl);
+        foundUser = false;
+        for (Entry<String, Object> entry : userColl.entrySet()) {
+            Map<String, Object> fields = (Map<String, Object>) entry.getValue();
+            ArrayList<Map<String,Object>> emails = (ArrayList<Map<String, Object>>) fields.get("emails");
+            if (emails.get(0).get("address").equals("test2@test.com")) {
+                foundUser = true;
+                break;
+            }
+        }
+        assertTrue(foundUser);
+    }
     
     //TODO: test SRP login
     // \"msg\":\"method\",\"method\":\"beginPasswordExchange\",\"params\":[{\"A\":\"df5a724a7e8ecadb707bdeda605b153e9334aaa6390ffe981500583087120b296f92d98ed73abf0f374bf650db26ff3ca392422455cb878ce35868da6e94549d306448e377b41183d33908fb7b36d81e476cce4be7d7b3ea3a5f9a6c3a07fde1a3b0decf8ca4ae28d5bdf29006ef5926aac4cfb97040cbf8375b52c583610b74\",\"user\":{\"email\":\"test@test.com\"}}],\"id\":\"1\"}"]

@@ -37,6 +37,13 @@ If you're planning to use this with Android, look at the
 which builds on top of this library
 to make it easier to work with an Android application.
 
+If you see this error:
+    Error generating final archive: Found duplicate file for APK: LICENSE.txt
+    Origin 1: C:\Users\you\.gradle\caches\artifacts-23\filestore\junit\junit\4.11\jar\4e031bb61df09069aeb2bffb4019e7a5034a4ee0\junit-4.11.jar
+    Origin 2: C:\Users\you\.gradle\caches\artifacts-23\filestore\org.hamcrest\hamcrest-core\1.3\jar\42a25dc3219429f0e5d060061f71acb49bf010a0\hamcrest-core-1.3.jar
+delete the LICENSE.txt from one of those jar files using "zip -d".  This is a bug in
+Eclipse's Gradle plugin.
+
 Design
 ------
 The Map&lt;String,Object> data type is used extensively; this is an interface 

@@ -3,7 +3,8 @@ apply plugin: 'eclipse'
 apply plugin: 'signing'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.5
+group = 'com.keysolutions'
+version = '0.5.7.1'
 
 // get rid of bootclasspath warning by setting it
 def env = System.getenv()
@@ -13,8 +14,6 @@ project.tasks.withType(AbstractCompile, { AbstractCompile ac ->
     ac.options.bootClasspath = bootClasspathStr // options is always there but not defined on AbstractCompile so going to hit it anyway
 })
 
-group = 'com.keysolutions'
-version = '0.5.7.1'
 jar {
     manifest {
         attributes 'Implementation-Title': 'Java DDP Client Library', 'Implementation-Version': version
