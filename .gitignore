@@ -12,3 +12,4 @@ build/ivy.xml
 bin/
 .gradle
 
+.settings/org.eclipse.jdt.core.prefs

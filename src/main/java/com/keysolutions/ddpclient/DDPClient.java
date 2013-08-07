@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import org.java_websocket.WebSocket.READYSTATE;
 import org.java_websocket.client.WebSocketClient;
@@ -37,8 +36,7 @@ import com.google.gson.Gson;
  * @author kenyee
  */
 public class DDPClient extends Observable {
-    private final static Logger LOGGER = Logger.getLogger(DDPClient.class
-            .getName());
+    private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     /** Field names supported in the DDP protocol */
     public class DdpMessageField {
@@ -197,7 +195,7 @@ public class DDPClient extends Observable {
      * confirmation message to the Meteor server.
      */
     private void connectionOpened() {
-        LOGGER.finest("WebSocket connection opened");
+        log.trace("WebSocket connection opened");
         // reply to Meteor server with connection confirmation message ({"msg":
         // "connect"})
         Map<String, Object> connectMsg = new HashMap<String, Object>();
@@ -221,7 +219,7 @@ public class DDPClient extends Observable {
         // changed formatting to always return a JSON object
         String closeMsg = "{\"msg\":\"closed\",\"code\":\"" + code
                 + "\",\"reason\":\"" + reason + "\",\"remote\":" + remote + "}";
-        LOGGER.finest(closeMsg);
+        log.debug("{}", closeMsg);
         received(closeMsg);
     }
 
@@ -238,7 +236,7 @@ public class DDPClient extends Observable {
         }
         String errorMsg = "{\"msg\":\"error\",\"source\":\"WebSocketClient\",\"errormsg\":\""
                 + errmsg + "\"}";
-        LOGGER.finest(errorMsg);
+        log.debug("{}", errorMsg);
         // ex.printStackTrace();
         received(errorMsg);
     }
@@ -469,7 +467,7 @@ public class DDPClient extends Observable {
      */
     public void send(Map<String, Object> connectMsg) {
         String json = mGson.toJson(connectMsg);
-        /*System.out.println*/LOGGER.fine("Sending " + json);
+        /*System.out.println*/log.debug("Sending {}" + json);
         try {
         this.mWsClient.send(json);
         } catch (WebsocketNotConnectedException ex) {
@@ -486,7 +484,7 @@ public class DDPClient extends Observable {
      */
     @SuppressWarnings("unchecked")
     public void received(String msg) {
-        /*System.out.println*/LOGGER.fine("Received response: " + msg);
+         /*System.out.println*/log.debug("Received response: {}", msg);
         this.setChanged();
         // generic object deserialization is from
         // http://programmerbruce.blogspot.com/2011/06/gson-v-jackson.html
