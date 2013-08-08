@@ -284,6 +284,16 @@ public class DDPClient extends Observable {
             mConnectionStarted = true;
         }
     }
+    
+    /**
+     * Closes an open websocket connection.
+     * This is async, so you'll get a close notification callback when it eventually closes.
+     */
+    public void disconnect() {
+        if (this.mWsClient.getReadyState() == READYSTATE.OPEN) {
+            this.mWsClient.close();
+        }
+    }
 
     /**
      * Call a meteor method with the supplied parameters

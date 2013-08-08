@@ -17,7 +17,9 @@ Differences include:
 * handles all the DDP message types from the server
 * websocket closed/error state changes converted to regular observer events instead
   of dumping errors to System.out
+* added full Javadocs
 * use slf4j for logging instead of java.util.Logging
+* added a disconnect method to close the websocket connection
 
 Usage
 -----
@@ -102,6 +104,7 @@ The version of the library will match the Meteor.js DDP protocol version with th
 library revision in the last digit (0.5.7.1, 0.5.7.2, etc.)
 
 * 0.5.7.2 - switched to SLF4J logging library instead of using java.util.Logging
+* 0.5.7.3 - added disconnect() method
 
 To-Do
 -----

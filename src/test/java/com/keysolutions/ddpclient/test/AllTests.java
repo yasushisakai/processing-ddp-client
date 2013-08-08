@@ -21,7 +21,8 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestDDPAuth.class, TestDDPCollections.class })
+@SuiteClasses({ TestDDPBasic.class, TestDDPConnections.class,
+    TestDDPAuth.class, TestDDPCollections.class, TestDDPUsers.class })
 public class AllTests {
 
 }

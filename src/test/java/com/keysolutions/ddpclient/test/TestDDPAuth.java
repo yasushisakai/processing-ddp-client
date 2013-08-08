@@ -16,21 +16,12 @@
 
 package com.keysolutions.ddpclient.test;
 
-import java.lang.reflect.Method;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import junit.framework.TestCase;
 
-import com.google.gson.Gson;
 import com.keysolutions.ddpclient.DDPClient;
 import com.keysolutions.ddpclient.EmailAuth;
 import com.keysolutions.ddpclient.TokenAuth;
-import com.keysolutions.ddpclient.UsernameAuth;
 import com.keysolutions.ddpclient.test.DDPTestClientObserver.DDPSTATE;
-
-import junit.framework.TestCase;
 
 /**
  * Tests for authentication
@@ -47,64 +38,10 @@ public class TestDDPAuth extends TestCase {
     }
     
     /**
-     * Verifies that gson converts auth info classes properly to JSON
-     * @throws Exception
-     */
-    public void testGson2JSonAuthInfo() throws Exception {
-        // test username/password is encoded properly
-        UsernameAuth userpass = new UsernameAuth("test", "pw");
-        Gson gson = new Gson();
-        String jsonUserpass = gson.toJson(userpass);
-        assertEquals("{\"password\":\"pw\",\"user\":{\"username\":\"test\"}}", jsonUserpass);
-        // test email/password is encoded properly
-        EmailAuth emailpass = new EmailAuth("test@me.com", "pw");
-        String jsonEmailpass = gson.toJson(emailpass);
-        assertEquals("{\"password\":\"pw\",\"user\":{\"email\":\"test@me.com\"}}", jsonEmailpass);
-        // test resumetoken is encoded properly
-        TokenAuth token = new TokenAuth("mytoken");
-        String jsonToken = gson.toJson(token);
-        assertEquals("{\"resume\":\"mytoken\"}", jsonToken);       
-    }
-    
-    /**
-     * Verifies that errors are handled properly
-     * @throws Exception
-     */
-    public void testHandleError() throws Exception {
-        DDPClient ddp = new DDPClient("", 0);
-        DDPTestClientObserver obs = new DDPTestClientObserver();
-        ddp.addObserver(obs);
-        // do this convoluted thing to test a private method
-        Method method = DDPClient.class.getDeclaredMethod("handleError", Exception.class);
-        method.setAccessible(true);
-        method.invoke(ddp, new Exception("ignore exception"));
-        assertEquals("WebSocketClient", obs.mErrorSource);
-        assertEquals("ignore exception", obs.mErrorMsg);
-    }
-    
-    /**
-     * Verifies that a connection can be closed
-     * @throws Exception
-     */
-    public void testConnectionClosed() throws Exception {
-        DDPClient ddp = new DDPClient("", 0);
-        DDPTestClientObserver obs = new DDPTestClientObserver();
-        ddp.addObserver(obs);
-        // do this convoluted thing to test a private method
-        Method method = DDPClient.class.getDeclaredMethod("connectionClosed", int.class, String.class, boolean.class);
-        method.setAccessible(true);
-        method.invoke(ddp, 5, "test", true);
-        assertEquals(5, obs.mCloseCode);
-        assertEquals("test", obs.mCloseReason);
-        assertEquals(true, obs.mCloseFromRemote);
-    }
-    
-    /**
      * Verifies that a bad login is rejected
      * @throws Exception
      */
     public void testBadLogin() throws Exception {
-        //// test out invalid login username/email
         // create DDP client instance and hook testobserver to it
         DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
@@ -142,7 +79,6 @@ public class TestDDPAuth extends TestCase {
      * @throws Exception
      */
     public void testBadPassword() throws Exception {
-        //// test out invalid password
         // create DDP client instance and hook testobserver to it
         DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
@@ -181,7 +117,6 @@ public class TestDDPAuth extends TestCase {
      */
     public void testLogin() throws Exception {
         //TODO: does this belong inside the Java DDP client?
-        //// test out regular login
         // create DDP client instance and hook testobserver to it
         DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
@@ -236,75 +171,6 @@ public class TestDDPAuth extends TestCase {
         
         // verify that we have the user in the users collection after login
         assertTrue(obs.mCollections.get("users").size() == 1);
-    }
-    
-    /**
-     * Tests that we can create a user and log in
-     * @throws URISyntaxException 
-     * @throws InterruptedException 
-     */
-    @SuppressWarnings("unchecked")
-    public void testCreateUser() throws URISyntaxException, InterruptedException {
-        //TODO: does this belong inside the Java DDP client?
-        // create DDP client instance and hook testobserver to it
-        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
-        DDPTestClientObserver obs = new DDPTestClientObserver();
-        ddp.addObserver(obs);                    
-        // make connection to Meteor server
-        ddp.connect();          
-
-        // we need to wait a bit before the socket is opened but make sure it's successful
-        Thread.sleep(500);
-        assertTrue(obs.mDdpState == DDPSTATE.Connected);
-        
-        // subscribe to user collection
-        ddp.subscribe("users", new Object[] {});
-        
-        // delete old user first in case this test has been run before
-        Object[] methodArgs = new Object[1];
-        methodArgs[0] = "test2@test.com";
-        ddp.call("deleteUser", methodArgs, obs);
-        
-        // we need to wait a bit in case there was a deletion
-        Thread.sleep(500);
-
-        // make sure user doesn't exist
-        Map<String, Object> userColl = obs.mCollections.get("users");
-        assertNotNull(userColl);
-        boolean foundUser = false;
-        for (Entry<String, Object> entry : userColl.entrySet()) {
-            Map<String, Object> fields = (Map<String, Object>) entry.getValue();
-            ArrayList<Map<String,Object>> emails = (ArrayList<Map<String, Object>>) fields.get("emails");
-            assertFalse(emails.get(0).get("address").equals("test2@test.com"));
-        }
-        
-        // create new user
-        Map<String,Object> options = new HashMap<String,Object>();
-        methodArgs[0] = options;
-        options.put("username", "test2@test.com");
-        options.put("email", "test2@test.com");
-        options.put("password", "1234");
-        ddp.call("createUser", methodArgs);
-        
-        // we need to wait a bit for the insertion or error
-        Thread.sleep(500);
-        
-        // make sure we have no errors
-        assertEquals(0, obs.mErrorCode);
-        
-        // check that users collection has this user
-        userColl = obs.mCollections.get("users");
-        assertNotNull(userColl);
-        foundUser = false;
-        for (Entry<String, Object> entry : userColl.entrySet()) {
-            Map<String, Object> fields = (Map<String, Object>) entry.getValue();
-            ArrayList<Map<String,Object>> emails = (ArrayList<Map<String, Object>>) fields.get("emails");
-            if (emails.get(0).get("address").equals("test2@test.com")) {
-                foundUser = true;
-                break;
-            }
-        }
-        assertTrue(foundUser);
     }
     
     //TODO: test SRP login
