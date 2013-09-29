@@ -105,6 +105,8 @@ library revision in the last digit (0.5.7.1, 0.5.7.2, etc.)
 
 * 0.5.7.2 - switched to SLF4J logging library instead of using java.util.Logging
 * 0.5.7.3 - added disconnect() method
+* 0.5.7.4 - fix Maven dynamic version syntax
+* 0.5.7.5 - retargeted to JDK 1.5 so Mac OSX users won't have problem linking
 
 To-Do
 -----
