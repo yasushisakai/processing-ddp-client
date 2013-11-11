@@ -69,8 +69,8 @@ and then overriding any methods you want to handle:
 	ddp.call("login", params, new DDPListener() {
 		@Override
 		void onResult(Map<String, Object> resultFields) {
-			if (jsonFields.containsKey("error")) {
-				Map<String, Object> error = (Map<String, Object>) jsonFields.get(DdpMessageField.ERROR);
+			if (resultFields.containsKey(DdpMessageField.ERROR)) {
+				Map<String, Object> error = (Map<String, Object>) resultFields.get(DdpMessageField.ERROR);
 				errorReason = (String) error.get("reason");
 				System.err.println("Login failure: " + errorReason);
 			} else {
