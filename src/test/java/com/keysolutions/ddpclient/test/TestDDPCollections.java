@@ -1,5 +1,5 @@
 /*
-* (c)Copyright 2013 Ken Yee, KEY Enterprise Solutions 
+* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions 
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ public class TestDDPCollections {
 
     @Before
     public void setUp() throws Exception {
+        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+
         // create DDP client instance and hook testobserver to it
         mDdp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
         mObs = new DDPTestClientObserver();
@@ -213,5 +215,57 @@ public class TestDDPCollections {
         // verify that the collection is now empty
         Thread.sleep(500);
         assertEquals(0, mObs.mCollections.get("TestCollection").size());
+    }
+    
+    
+    /**
+     * Test server side delete field and add field
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testServerSideFieldUpdate() throws Exception {
+        org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+        if (log.isDebugEnabled()) {
+            System.out.println("debug enabled");
+        }
+        
+        // put collection in clean state
+        mDdp.call("clearCollection", new Object[] {});
+        // subscribe to TestCollection
+        mDdp.subscribe("testData", new Object[]{});      
+        // add a doc to collection
+        Object[] methodArgs = new Object[1];
+        Map<String,Object> options = new HashMap<String,Object>();
+        options.put("value", "a");
+        options.put("docnum", 1);
+        options.put("testfield", "test");
+        options.put("userid", mObs.mUserId);
+        methodArgs[0] = options;
+        // you need to specify the _id if you're creating doc on client
+        options.put("_id", UUID.randomUUID().toString());
+        mDdp.collectionInsert("TestCollection", options, mObs);
+        // wait a bit to get it sync'd back down
+        Thread.sleep(500);
+        assertTrue(mObs.mCollections.containsKey("TestCollection"));
+        assertEquals(1, mObs.mCollections.get("TestCollection").size());
+        // check that field added on server comes down
+        Map<String, Object> coll = mObs.mCollections.get("TestCollection");
+        Entry<String, Object> docEntry = coll.entrySet().iterator().next();
+        String docId = (String) docEntry.getKey();
+        Map<String, Object> doc = (Map<String, Object>) coll.get(docId);
+        assertNull(doc.get("newField"));
+        options.clear();
+        options.put("id", docId);
+        options.put("value", "hello");
+        mDdp.call("addField", new Object[] { options });
+        // wait a bit to get it sync'd back down
+        Thread.sleep(500);
+        assertEquals("hello", doc.get("newfield"));
+        // check that field deleted on server deletes it in local doc
+        mDdp.call("deleteField", new Object[] { options });
+        // wait a bit to get delete field sync'd back down
+        Thread.sleep(500);
+        assertNull(doc.get("newfield"));        
     }
 }

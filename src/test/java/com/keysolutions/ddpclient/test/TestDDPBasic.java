@@ -1,5 +1,5 @@
 /*
-* (c)Copyright 2013 Ken Yee, KEY Enterprise Solutions 
+* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions 
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import junit.framework.TestCase;
 public class TestDDPBasic extends TestCase {
 
     protected void setUp() throws Exception {
+        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+
         super.setUp();
     }
 

@@ -107,10 +107,11 @@ library revision in the last digit (0.5.7.1, 0.5.7.2, etc.)
 * 0.5.7.3 - added disconnect() method
 * 0.5.7.4 - fix Maven dynamic version syntax
 * 0.5.7.5 - retargeted to JDK 1.5 so Mac OSX users won't have problem linking
+* 0.5.7.6 - add unit tests for add/delete field
 
 To-Do
 -----
-* Add SRP and OAuth login support.
+* Add SRP (using Nimbus SRP library?) and OAuth login support.
 * Add "create new user" test.
 * Test all possible EJSON data types.
 * Handle insertBefore and insertAfter collection update messages (may be 
