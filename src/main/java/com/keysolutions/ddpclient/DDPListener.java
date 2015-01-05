@@ -24,8 +24,8 @@ import java.util.Map;
  */
 public class DDPListener {
     /**
-     * Callback for with all result fields
-     * @param resultFields
+     * Callback for method call with all result fields
+     * @param resultFields returned results from method call
      */
     public void onResult(Map<String, Object> resultFields) {}
     
@@ -47,4 +47,10 @@ public class DDPListener {
      * @param errorFields fields holding error info
      */
     public void onNoSub(String callId, Map<String, Object> errorFields) {}
+    
+    /**
+     * Callback for receiving a Pong back from the server
+     * @param pingId ping ID (mandatory)
+     */
+    public void onPong(String pingId) {}
 }

@@ -57,6 +57,7 @@ public class DDPTestClientObserver extends DDPListener implements Observer {
     public boolean mCloseFromRemote;
     public Map<String, Map<String, Object>> mCollections;
     public String mReadySubscription;
+    public String mPingId;
     
     public DDPTestClientObserver() {
         mDdpState = DDPSTATE.Disconnected;
@@ -205,5 +206,10 @@ public class DDPTestClientObserver extends DDPListener implements Observer {
     @Override
     public void onReady(String id) {
         mReadySubscription = id;
+    }
+    
+    @Override
+    public void onPong(String id) {
+        mPingId = id;
     }
 }

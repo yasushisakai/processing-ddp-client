@@ -82,21 +82,21 @@ and then overriding any methods you want to handle:
 
 DDP Protocol Version
 --------------------
-This library currently supports DDP Protocol 0.5.7 (works with Meteor 0.6.4.1 though).
+This library currently supports DDP Protocol 1 (previous version supported pre1).
 
 Maven Artifact
 --------------
 This library is in the Maven Central Library hosted by Sonatype.
 In Gradle, you can reference it with this in your dependencies:
 
-    compile group: 'com.keysolutions', name: 'java-ddp-client', version: '0.5.7.+'
+    compile group: 'com.keysolutions', name: 'java-ddp-client', version: '1.0.0.+'
 
 And in Maven, you can reference it with this:
 
     <dependency>
       <groupId>com.keysolutions</groupId>
       <artifactId>java-ddp-client</artifactId>
-      <version>0.5.7.1</version>
+      <version>1.0.0.0</version>
       <type>pom</type>
     </dependency>
 
@@ -108,6 +108,7 @@ library revision in the last digit (0.5.7.1, 0.5.7.2, etc.)
 * 0.5.7.4 - fix Maven dynamic version syntax
 * 0.5.7.5 - retargeted to JDK 1.5 so Mac OSX users won't have problem linking
 * 0.5.7.6 - add unit tests for add/delete field
+* 1.0.0.0 - added ping/pong support and bumped version to match Meteor's DDP version
 
 To-Do
 -----

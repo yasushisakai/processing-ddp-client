@@ -81,10 +81,12 @@ public class DDPClient extends Observable {
         public static final String ADDED = "added";
         public static final String REMOVED = "removed";
         public static final String CHANGED = "changed";
+        public static final String PING = "ping";
+        public static final String PONG = "pong";
     }
 
     /** DDP protocol version */
-    private final static String DDP_PROTOCOL_VERSION = "pre1";
+    private final static String DDP_PROTOCOL_VERSION = "1";
     /** DDP connection state */
     public enum CONNSTATE {
         Disconnected,
@@ -114,7 +116,7 @@ public class DDPClient extends Observable {
      * @param meteorServerIp IP of Meteor server
      * @param meteorServerPort Port of Meteor server, if left null it will default to 3000
      * @param useSSL Whether to use SSL for websocket encryption
-     * @throws URISyntaxException
+     * @throws URISyntaxException URI error
      */
     public DDPClient(String meteorServerIp, Integer meteorServerPort, boolean useSSL)
             throws URISyntaxException {
@@ -131,7 +133,7 @@ public class DDPClient extends Observable {
      *            - IP of Meteor server
      * @param meteorServerPort
      *            - Port of Meteor server, if left null it will default to 3000
-     * @throws URISyntaxException
+     * @throws URISyntaxException URI error
      */
     public DDPClient(String meteorServerIp, Integer meteorServerPort)
             throws URISyntaxException {
@@ -161,7 +163,7 @@ public class DDPClient extends Observable {
     /**
      * Creates a web socket client
      * @param meteorServerAddress Websocket address of Meteor server
-     * @throws URISyntaxException
+     * @throws URISyntaxException URI error
      */
     public void createWsClient(String meteorServerAddress)
             throws URISyntaxException {
@@ -301,6 +303,7 @@ public class DDPClient extends Observable {
      * @param method name of corresponding Meteor method
      * @param params arguments to be passed to the Meteor method
      * @param resultListener DDP command listener for this method call
+     * @return ID for next command
      */
     public int call(String method, Object[] params, DDPListener resultListener) {
         Map<String, Object> callMsg = new HashMap<String, Object>();
@@ -322,6 +325,7 @@ public class DDPClient extends Observable {
      * 
      * @param method name of corresponding Meteor method
      * @param params arguments to be passed to the Meteor method
+     * @return ID for next command
      */
     public int call(String method, Object[] params) {
         return call(method, params, null);
@@ -333,6 +337,7 @@ public class DDPClient extends Observable {
      * @param name name of the corresponding Meteor subscription
      * @param params arguments corresponding to the Meteor subscription
      * @param resultListener DDP command listener for this call
+     * @return ID for next command
      */
     public int subscribe(String name, Object[] params,
             DDPListener resultListener) {
@@ -355,6 +360,7 @@ public class DDPClient extends Observable {
      * 
      * @param name name of the corresponding Meteor subscription
      * @param params arguments corresponding to the Meteor subscription
+     * @return ID for next command
      */
     public int subscribe(String name, Object[] params) {
         return subscribe(name, params, null);
@@ -365,6 +371,7 @@ public class DDPClient extends Observable {
      * 
      * @param name name of the corresponding Meteor subscription
      * @param resultListener DDP command listener for this call
+     * @return ID for next command
      */
     public int unsubscribe(String name, DDPListener resultListener) {
         Map<String, Object> unsubMsg = new HashMap<String, Object>();
@@ -380,8 +387,8 @@ public class DDPClient extends Observable {
     /**
      * Unsubscribe from a Meteor record set
      * 
-     * @param name
-     *            - name of the corresponding Meteor subscription
+     * @param name name of the corresponding Meteor subscription
+     * @return ID for next command
      */
     public int unsubscribe(String name) {
         return unsubscribe(name, null);
@@ -469,14 +476,32 @@ public class DDPClient extends Observable {
             Map<String, Object> updateParams) {
         return collectionUpdate(collectionName, docId, updateParams, null);
     }
+    
+    /**
+     * Pings the server...you'll get a Pong message back in the DDPListener
+     * @param pingId of ping message so you can tell if you have data loss
+     * @param resultListener DDP command listener for this call
+     */
+    public void ping(String pingId, DDPListener resultListener) {
+        Map<String, Object> pingMsg = new HashMap<String, Object>();
+        pingMsg.put(DdpMessageField.MSG, DdpMessageType.PING);
+        if (pingId != null) {
+            pingMsg.put(DdpMessageField.ID, pingId);
+        }
+        send(pingMsg);
+        if (resultListener != null) {
+            // store listener for callbacks
+            mMsgListeners.put(pingId, resultListener);
+        }
+    }
 
     /**
      * Converts DDP-formatted message to JSON and sends over web-socket
      * 
-     * @param connectMsg
+     * @param msgParams parameters for DDP msg
      */
-    public void send(Map<String, Object> connectMsg) {
-        String json = mGson.toJson(connectMsg);
+    public void send(Map<String, Object> msgParams) {
+        String json = mGson.toJson(msgParams);
         /*System.out.println*/log.debug("Sending {}" + json);
         try {
         this.mWsClient.send(json);
@@ -548,9 +573,27 @@ public class DDPClient extends Observable {
             }
         } else if (msgtype.equals(DdpMessageType.CONNECTED)) {
             mConnState = CONNSTATE.Connected;
-        }
-        else if (msgtype.equals(DdpMessageType.CLOSED)) {
+        } else if (msgtype.equals(DdpMessageType.CLOSED)) {
             mConnState = CONNSTATE.Closed;
+        } else if (msgtype.equals(DdpMessageType.PING)) {
+            String pingId = (String) jsonFields.get(DdpMessageField.ID
+                    .toString());
+            // automatically send PONG command back to server
+            Map<String, Object> pongMsg = new HashMap<String, Object>();
+            pongMsg.put(DdpMessageField.MSG, DdpMessageType.PONG);
+            if (pingId != null) {
+                pongMsg.put(DdpMessageField.ID, pingId);
+            }
+            send(pongMsg);
+        } else if (msgtype.equals(DdpMessageType.PONG)) {
+            String pingId = (String) jsonFields.get(DdpMessageField.ID
+                    .toString());
+            // let listeners know a Pong happened
+            DDPListener listener = (DDPListener) mMsgListeners.get(pingId);
+            if (listener != null) {
+                listener.onPong(pingId);
+                mMsgListeners.remove(pingId);
+            }
         }
     }
 

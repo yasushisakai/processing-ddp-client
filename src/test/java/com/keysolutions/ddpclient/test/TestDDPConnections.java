@@ -77,4 +77,30 @@ public class TestDDPConnections extends TestCase {
         Thread.sleep(500);
         assertTrue(obs.mDdpState == DDPSTATE.Closed);
     }
+    
+    public void testPing() throws URISyntaxException, InterruptedException {
+        // create DDP client instance and hook testobserver to it
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPTestClientObserver obs = new DDPTestClientObserver();
+        ddp.addObserver(obs);                    
+        // make connection to Meteor server
+        ddp.connect();          
+
+        // we need to wait a bit before the socket is opened but make sure it's successful
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Connected);
+
+        // send a ping and verify we got a pong back
+        assertTrue(obs.mPingId == null);
+        ddp.ping("ping1", obs);
+        Thread.sleep(500);
+        assertTrue(obs.mPingId.equals("ping1"));
+        
+        // try disconnect
+        ddp.disconnect();
+        
+        // wait a bit to make sure our state has changed to closed
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Closed);
+    }
 }
