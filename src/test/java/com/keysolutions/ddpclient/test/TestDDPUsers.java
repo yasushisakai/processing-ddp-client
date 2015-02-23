@@ -52,7 +52,7 @@ public class TestDDPUsers extends TestCase {
     public void testCreateUser() throws URISyntaxException, InterruptedException {
         //TODO: does this belong inside the Java DDP client?
         // create DDP client instance and hook testobserver to it
-        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
         ddp.addObserver(obs);                    
         // make connection to Meteor server

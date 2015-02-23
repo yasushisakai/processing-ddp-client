@@ -96,7 +96,7 @@ And in Maven, you can reference it with this:
     <dependency>
       <groupId>com.keysolutions</groupId>
       <artifactId>java-ddp-client</artifactId>
-      <version>1.0.0.0</version>
+      <version>1.0.0.1</version>
       <type>pom</type>
     </dependency>
 
@@ -109,6 +109,7 @@ library revision in the last digit (0.5.7.1, 0.5.7.2, etc.)
 * 0.5.7.5 - retargeted to JDK 1.5 so Mac OSX users won't have problem linking
 * 0.5.7.6 - add unit tests for add/delete field
 * 1.0.0.0 - added ping/pong support and bumped version to match Meteor's DDP version
+* 1.0.0.1 - fix SSL support so it uses Java's default trusted CA certs
 
 To-Do
 -----

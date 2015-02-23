@@ -18,13 +18,21 @@ package com.keysolutions.ddpclient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
 import org.java_websocket.WebSocket.READYSTATE;
+import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.handshake.ServerHandshake;
@@ -158,6 +166,33 @@ public class DDPClient extends Observable {
         this.mCurrentId = 0;
         this.mMsgListeners = new ConcurrentHashMap<String, DDPListener>();
         createWsClient(mMeteorServerAddress);
+        
+        if (useSSL) {
+            try {
+                // set up trustkeystore w/ Java's default trusted 
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                KeyStore trustKeystore = null;
+                trustManagerFactory.init(trustKeystore);
+                /* 
+                for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
+                    if (trustManager instanceof X509TrustManager) {
+                        X509TrustManager x509TrustManager = (X509TrustManager)trustManager;
+                    }
+                }
+                */
+                SSLContext sslContext = null;
+                sslContext = SSLContext.getInstance( "TLS" );
+                sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+                // now we can set the web service client to use this SSL context
+                mWsClient.setWebSocketFactory( new DefaultSSLWebSocketClientFactory( sslContext ) );
+            } catch (KeyStoreException e) {
+                log.warn("Error accessing Java default cacerts keystore {}", e);
+            } catch (NoSuchAlgorithmException e) {
+                log.warn("Error accessing Java default trustmanager algorithms {}", e);
+            } catch (KeyManagementException e) {
+                log.warn("Error accessing Java default cacert keys {}", e);
+            }
+        }
     }
     
     /**
@@ -502,7 +537,7 @@ public class DDPClient extends Observable {
      */
     public void send(Map<String, Object> msgParams) {
         String json = mGson.toJson(msgParams);
-        /*System.out.println*/log.debug("Sending {}" + json);
+        /*System.out.println*/log.debug("Sending {}", json);
         try {
         this.mWsClient.send(json);
         } catch (WebsocketNotConnectedException ex) {

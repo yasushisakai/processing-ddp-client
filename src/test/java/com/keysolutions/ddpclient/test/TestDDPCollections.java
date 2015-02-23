@@ -44,7 +44,7 @@ public class TestDDPCollections {
         System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
 
         // create DDP client instance and hook testobserver to it
-        mDdp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        mDdp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         mObs = new DDPTestClientObserver();
         mDdp.addObserver(mObs);                    
         // make connection to Meteor server

@@ -45,7 +45,7 @@ public class TestDDPAuth extends TestCase {
      */
     public void testBadLogin() throws Exception {
         // create DDP client instance and hook testobserver to it
-        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
         ddp.addObserver(obs);                    
         // make connection to Meteor server
@@ -82,7 +82,7 @@ public class TestDDPAuth extends TestCase {
      */
     public void testBadPassword() throws Exception {
         // create DDP client instance and hook testobserver to it
-        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
         ddp.addObserver(obs);                    
         // make connection to Meteor server
@@ -120,7 +120,7 @@ public class TestDDPAuth extends TestCase {
     public void testLogin() throws Exception {
         //TODO: does this belong inside the Java DDP client?
         // create DDP client instance and hook testobserver to it
-        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
         ddp.addObserver(obs);                    
         // make connection to Meteor server
@@ -154,7 +154,7 @@ public class TestDDPAuth extends TestCase {
         
         //// test out resume token
         String resumeToken = obs.mResumeToken;
-        ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         obs = new DDPTestClientObserver();
         ddp.addObserver(obs);                    
         // make connection to Meteor server

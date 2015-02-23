@@ -19,8 +19,10 @@ package com.keysolutions.ddpclient.test;
 public final class TestConstants {
     // Specify location of Meteor server (assumes it is running locally)
     // If you're using VirtualBox, you can forward localhost to the VM running Meteor
-    public static final String sMeteorIp = "localhost";
+    public static final String sMeteorHost = "localhost";
     public static final Integer sMeteorPort = 3000;
+    //public static final String sMeteorHost = "meteor-test-ddp-endpoint.meteor.com";
+    //public static final Integer sMeteorPort = 443;
     
     // note also that your Meteor server app should also have 
     // a user named test@test.com with a password of "password"

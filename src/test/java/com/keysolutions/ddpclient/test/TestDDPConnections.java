@@ -37,7 +37,7 @@ public class TestDDPConnections extends TestCase {
     }
         
     /**
-     * Verifies connection closed callback handler works
+     * Verifies connection closed callback handler works (doesn't require a connection)
      * @throws Exception
      */
     public void testConnectionClosed() throws Exception {
@@ -60,7 +60,7 @@ public class TestDDPConnections extends TestCase {
      */
     public void testDisconnect() throws URISyntaxException, InterruptedException {
         // create DDP client instance and hook testobserver to it
-        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
         ddp.addObserver(obs);                    
         // make connection to Meteor server
@@ -80,7 +80,7 @@ public class TestDDPConnections extends TestCase {
     
     public void testPing() throws URISyntaxException, InterruptedException {
         // create DDP client instance and hook testobserver to it
-        DDPClient ddp = new DDPClient(TestConstants.sMeteorIp, TestConstants.sMeteorPort);
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
         DDPTestClientObserver obs = new DDPTestClientObserver();
         ddp.addObserver(obs);                    
         // make connection to Meteor server
@@ -94,6 +94,7 @@ public class TestDDPConnections extends TestCase {
         assertTrue(obs.mPingId == null);
         ddp.ping("ping1", obs);
         Thread.sleep(500);
+        assertNotNull(obs.mPingId);
         assertTrue(obs.mPingId.equals("ping1"));
         
         // try disconnect
@@ -102,5 +103,33 @@ public class TestDDPConnections extends TestCase {
         // wait a bit to make sure our state has changed to closed
         Thread.sleep(500);
         assertTrue(obs.mDdpState == DDPSTATE.Closed);
+    }
+    
+    
+    
+    /**
+     * Checks that we can connect to the server using SSL
+     * @throws URISyntaxException 
+     * @throws InterruptedException 
+     */
+    public void testUseSSL() throws URISyntaxException, InterruptedException {
+        //NOTE: this test will only pass if we're connecting to the server using SSL:
+        if (TestConstants.sMeteorPort != 443) {
+            return;
+        }
+        
+        // create DDP client instance and hook testobserver to it
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort, true);
+        DDPTestClientObserver obs = new DDPTestClientObserver();
+        ddp.addObserver(obs);                    
+        // make connection to Meteor server
+        ddp.connect();          
+
+        // we need to wait a bit before the socket is opened but make sure it's successful
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Connected);
+
+        // try disconnect
+        ddp.disconnect();
     }
 }
