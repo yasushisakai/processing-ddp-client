@@ -26,7 +26,7 @@ Usage
 The best thing to do is to look at the JUnit tests.  The tests are separated 
 into authentication tests and collection tests.  
 
-The TestDDPClientObserver in the JUnit tests is the core handler of DDP message 
+The DDPTestClientObserver in the JUnit tests is the core handler of DDP message 
 results and is a simple example of holding enough state to implement a simple 
 Meteor client.  Note that in a real application, you'll probably want to use an 
 eventbus to implement the DDP message handling.
