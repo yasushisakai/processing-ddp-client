@@ -29,6 +29,7 @@ import java.util.Observable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.java_websocket.WebSocket.READYSTATE;
@@ -137,6 +138,22 @@ public class DDPClient extends Observable {
      * port of 3000 but port 80 is the typical default for publicly deployed
      * servers)
      * 
+     * @param meteorServerIp IP of Meteor server
+     * @param meteorServerPort Port of Meteor server, if left null it will default to 3000
+     * @param trustManagers Explicitly defined trust managers, if null no SSL encryption would be used.
+     * @throws URISyntaxException URI error
+     */
+    public DDPClient(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers)
+            throws URISyntaxException {
+        initWebsocket(meteorServerIp, meteorServerPort, trustManagers);
+    }
+    
+    /**
+     * Instantiates a Meteor DDP client for the Meteor server located at the
+     * supplied IP and port (note: running Meteor locally will typically have a
+     * port of 3000 but port 80 is the typical default for publicly deployed
+     * servers)
+     * 
      * @param meteorServerIp
      *            - IP of Meteor server
      * @param meteorServerPort
@@ -157,36 +174,50 @@ public class DDPClient extends Observable {
      */
     private void initWebsocket(String meteorServerIp, Integer meteorServerPort, boolean useSSL)
             throws URISyntaxException {
-        mConnState = CONNSTATE.Disconnected;
-        if (meteorServerPort == null)
-            meteorServerPort = 3000;
-        mMeteorServerAddress = (useSSL ? "wss://" : "ws://")
-                + meteorServerIp + ":"
-                + meteorServerPort.toString() + "/websocket";
-        this.mCurrentId = 0;
-        this.mMsgListeners = new ConcurrentHashMap<String, DDPListener>();
-        createWsClient(mMeteorServerAddress);
-        
+    	TrustManager[] trustManagers = null;
         if (useSSL) {
             try {
                 // set up trustkeystore w/ Java's default trusted 
                 TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 KeyStore trustKeystore = null;
                 trustManagerFactory.init(trustKeystore);
-                /* 
-                for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
-                    if (trustManager instanceof X509TrustManager) {
-                        X509TrustManager x509TrustManager = (X509TrustManager)trustManager;
-                    }
-                }
-                */
-                SSLContext sslContext = null;
-                sslContext = SSLContext.getInstance( "TLS" );
-                sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
-                // now we can set the web service client to use this SSL context
-                mWsClient.setWebSocketFactory( new DefaultSSLWebSocketClientFactory( sslContext ) );
+                trustManagers = trustManagerFactory.getTrustManagers();
             } catch (KeyStoreException e) {
                 log.warn("Error accessing Java default cacerts keystore {}", e);
+            } catch (NoSuchAlgorithmException e) {
+                log.warn("Error accessing Java default trustmanager algorithms {}", e);
+            }
+        }
+        
+        initWebsocket(meteorServerIp, meteorServerPort, trustManagers);
+    }
+    
+    /**
+     * Initializes a websocket connection
+     * @param meteorServerIp IP address of Meteor server
+     * @param meteorServerPort port of Meteor server, if left null it will default to 3000
+     * @param trustManagers array explicitly defined trust managers, can be null
+     * @throws URISyntaxException
+     */
+    private void initWebsocket(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers)
+            throws URISyntaxException {
+        mConnState = CONNSTATE.Disconnected;
+        if (meteorServerPort == null)
+            meteorServerPort = 3000;
+        mMeteorServerAddress = (trustManagers != null ? "wss://" : "ws://")
+                + meteorServerIp + ":"
+                + meteorServerPort.toString() + "/websocket";
+        this.mCurrentId = 0;
+        this.mMsgListeners = new ConcurrentHashMap<String, DDPListener>();
+        createWsClient(mMeteorServerAddress);
+        
+        if (trustManagers != null) {
+            try {
+                SSLContext sslContext = null;
+                sslContext = SSLContext.getInstance( "TLS" );
+                sslContext.init(null, trustManagers, null);
+                // now we can set the web service client to use this SSL context
+                mWsClient.setWebSocketFactory( new DefaultSSLWebSocketClientFactory( sslContext ) );
             } catch (NoSuchAlgorithmException e) {
                 log.warn("Error accessing Java default trustmanager algorithms {}", e);
             } catch (KeyManagementException e) {
