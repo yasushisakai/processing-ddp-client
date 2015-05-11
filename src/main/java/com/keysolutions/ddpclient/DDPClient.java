@@ -111,6 +111,8 @@ public class DDPClient extends Observable {
     private WebSocketClient mWsClient;
     /** web socket address for reconnections */
     private String mMeteorServerAddress;
+    /** trust managers for reconnections */
+    private TrustManager[] mTrustManagers;
     /** we can't connect more than once on a new socket */
     private boolean mConnectionStarted;
     /** Google GSON object */
@@ -211,11 +213,20 @@ public class DDPClient extends Observable {
         this.mMsgListeners = new ConcurrentHashMap<String, DDPListener>();
         createWsClient(mMeteorServerAddress);
         
-        if (trustManagers != null) {
+        mTrustManagers = trustManagers;
+        initWsClientSSL();
+    }
+
+    /**
+     * initializes WS client's trust managers
+     * @param trustManagers
+     */
+    private void initWsClientSSL() {
+        if (mTrustManagers != null) {
             try {
                 SSLContext sslContext = null;
                 sslContext = SSLContext.getInstance( "TLS" );
-                sslContext.init(null, trustManagers, null);
+                sslContext.init(null, mTrustManagers, null);
                 // now we can set the web service client to use this SSL context
                 mWsClient.setWebSocketFactory( new DefaultSSLWebSocketClientFactory( sslContext ) );
             } catch (NoSuchAlgorithmException e) {
@@ -342,6 +353,7 @@ public class DDPClient extends Observable {
             // we need to create a new wsClient because a closed websocket cannot be reused
             try {
                 createWsClient(mMeteorServerAddress);
+                initWsClientSSL();
             } catch (URISyntaxException e) {
                 // we shouldn't get URI exceptions because the address was validated in initWebsocket
             }

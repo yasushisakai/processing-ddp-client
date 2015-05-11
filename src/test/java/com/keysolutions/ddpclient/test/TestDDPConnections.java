@@ -78,6 +78,51 @@ public class TestDDPConnections extends TestCase {
         assertTrue(obs.mDdpState == DDPSTATE.Closed);
     }
     
+    /**
+     * Tests that we can handle reconnections to the server
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     */
+    public void testReconnect() throws URISyntaxException, InterruptedException {
+        // create DDP client instance and hook testobserver to it
+        DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
+        DDPTestClientObserver obs = new DDPTestClientObserver();
+        ddp.addObserver(obs);                    
+        // make connection to Meteor server
+        ddp.connect();          
+
+        // we need to wait a bit before the socket is opened but make sure it's successful
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Connected);
+
+        // try disconnect
+        ddp.disconnect();
+        
+        // wait a bit to make sure our state has changed to closed
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Closed);
+        
+        // now test that we can reconnect to the server
+        ddp.connect();
+
+        // we need to wait a bit before the socket is opened but make sure it's successful
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Connected);
+
+        // try disconnect
+        ddp.disconnect();
+        
+        // wait a bit to make sure our state has changed to closed
+        Thread.sleep(500);
+        assertTrue(obs.mDdpState == DDPSTATE.Closed);
+    }
+    
+    
+    /**
+     * Tests that the server ping command is handled properly
+     * @throws URISyntaxException
+     * @throws InterruptedException
+     */
     public void testPing() throws URISyntaxException, InterruptedException {
         // create DDP client instance and hook testobserver to it
         DDPClient ddp = new DDPClient(TestConstants.sMeteorHost, TestConstants.sMeteorPort);
