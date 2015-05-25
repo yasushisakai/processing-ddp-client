@@ -127,6 +127,7 @@ public class DDPClient extends Observable {
      * @param meteorServerIp IP of Meteor server
      * @param meteorServerPort Port of Meteor server, if left null it will default to 3000
      * @param useSSL Whether to use SSL for websocket encryption
+     * @param gson A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
     public DDPClient(String meteorServerIp, Integer meteorServerPort, boolean useSSL, Gson gson)
@@ -160,6 +161,7 @@ public class DDPClient extends Observable {
      * @param meteorServerIp IP of Meteor server
      * @param meteorServerPort Port of Meteor server, if left null it will default to 3000
      * @param trustManagers Explicitly defined trust managers, if null no SSL encryption would be used.
+     * @param gson A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
     public DDPClient(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers, Gson gson)
@@ -194,6 +196,8 @@ public class DDPClient extends Observable {
      *            - IP of Meteor server
      * @param meteorServerPort
      *            - Port of Meteor server, if left null it will default to 3000
+     * @param gson
+     *            - A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
     public DDPClient(String meteorServerIp, Integer meteorServerPort, Gson gson)
