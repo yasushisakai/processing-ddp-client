@@ -116,7 +116,7 @@ public class DDPClient extends Observable {
     /** we can't connect more than once on a new socket */
     private boolean mConnectionStarted;
     /** Google GSON object */
-    private final Gson mGson = new Gson();
+    private final Gson mGson;
 
     /**
      * Instantiates a Meteor DDP client for the Meteor server located at the
@@ -129,9 +129,26 @@ public class DDPClient extends Observable {
      * @param useSSL Whether to use SSL for websocket encryption
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort, boolean useSSL)
+    public DDPClient(String meteorServerIp, Integer meteorServerPort, boolean useSSL, Gson gson)
             throws URISyntaxException {
+        mGson = gson;
         initWebsocket(meteorServerIp, meteorServerPort, useSSL);
+    }
+
+    /**
+     * Instantiates a Meteor DDP client for the Meteor server located at the
+     * supplied IP and port (note: running Meteor locally will typically have a
+     * port of 3000 but port 80 is the typical default for publicly deployed
+     * servers)
+     *
+     * @param meteorServerIp IP of Meteor server
+     * @param meteorServerPort Port of Meteor server, if left null it will default to 3000
+     * @param useSSL Whether to use SSL for websocket encryption
+     * @throws URISyntaxException URI error
+     */
+    public DDPClient(String meteorServerIp, Integer meteorServerPort, boolean useSSL)
+      throws URISyntaxException {
+        this(meteorServerIp, meteorServerPort, useSSL, new Gson());
     }
     
     /**
@@ -145,9 +162,26 @@ public class DDPClient extends Observable {
      * @param trustManagers Explicitly defined trust managers, if null no SSL encryption would be used.
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers)
+    public DDPClient(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers, Gson gson)
             throws URISyntaxException {
+        mGson = gson;
         initWebsocket(meteorServerIp, meteorServerPort, trustManagers);
+    }
+
+    /**
+     * Instantiates a Meteor DDP client for the Meteor server located at the
+     * supplied IP and port (note: running Meteor locally will typically have a
+     * port of 3000 but port 80 is the typical default for publicly deployed
+     * servers)
+     *
+     * @param meteorServerIp IP of Meteor server
+     * @param meteorServerPort Port of Meteor server, if left null it will default to 3000
+     * @param trustManagers Explicitly defined trust managers, if null no SSL encryption would be used.
+     * @throws URISyntaxException URI error
+     */
+    public DDPClient(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers)
+      throws URISyntaxException {
+        this(meteorServerIp, meteorServerPort, trustManagers, new Gson());
     }
     
     /**
@@ -162,9 +196,26 @@ public class DDPClient extends Observable {
      *            - Port of Meteor server, if left null it will default to 3000
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort)
+    public DDPClient(String meteorServerIp, Integer meteorServerPort, Gson gson)
             throws URISyntaxException {
-        initWebsocket(meteorServerIp, meteorServerPort, false);
+        this(meteorServerIp, meteorServerPort, false, gson);
+    }
+
+    /**
+     * Instantiates a Meteor DDP client for the Meteor server located at the
+     * supplied IP and port (note: running Meteor locally will typically have a
+     * port of 3000 but port 80 is the typical default for publicly deployed
+     * servers)
+     *
+     * @param meteorServerIp
+     *            - IP of Meteor server
+     * @param meteorServerPort
+     *            - Port of Meteor server, if left null it will default to 3000
+     * @throws URISyntaxException URI error
+     */
+    public DDPClient(String meteorServerIp, Integer meteorServerPort)
+      throws URISyntaxException {
+        this(meteorServerIp, meteorServerPort, false);
     }
     
     /**
