@@ -111,6 +111,7 @@ library revision in the last digit (0.5.7.1, 0.5.7.2, etc.)
 * 1.0.0.0 - added ping/pong support and bumped version to match Meteor's DDP version
 * 1.0.0.1 - fix SSL support so it uses Java's default trusted CA certs
 * 1.0.0.2 - fix trustmanager SSL handling when reconnecting; added ability to pass in trustmanager; add reconnect unit test
+* 1.0.0.3 - update to Apache Commons 4; add custom Gson constructor
 
 To-Do
 -----
