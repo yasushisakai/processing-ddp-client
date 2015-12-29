@@ -1,5 +1,5 @@
 /*
-* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions 
+* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
 * limitations under the License.
 */
 
-package com.keysolutions.ddpclient;
+package ddpclient;
 
 /**
- * For logging in w/ resume token
+ * For sending Meteor a username/password for authentication
  * @author kenyee
  */
-public class TokenAuth {
-    String resume;
-
-    public TokenAuth(String token) {
-        assert(token != null);
-        this.resume = token;
+public class EmailAuth extends PasswordAuth
+{
+    public EmailAuth(String email, String pw) {
+        super(pw);
+        assert(email != null);
+        this.user.put("email", email);
     }
 }

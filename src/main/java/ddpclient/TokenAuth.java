@@ -1,5 +1,5 @@
 /*
-* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions 
+* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,15 +14,17 @@
 * limitations under the License.
 */
 
-package com.keysolutions.ddpclient.test;
+package ddpclient;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+/**
+ * For logging in w/ resume token
+ * @author kenyee
+ */
+public class TokenAuth {
+    String resume;
 
-@RunWith(Suite.class)
-@SuiteClasses({ TestDDPBasic.class, TestDDPConnections.class,
-    TestDDPAuth.class, TestDDPCollections.class, TestDDPUsers.class })
-public class AllTests {
-
+    public TokenAuth(String token) {
+        assert(token != null);
+        this.resume = token;
+    }
 }

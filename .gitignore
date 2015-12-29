@@ -11,6 +11,6 @@ build/tmp/
 build/ivy.xml
 bin/
 .gradle
-.classpath
-.settings/
 
+library/
+!library/ddpclient.jar

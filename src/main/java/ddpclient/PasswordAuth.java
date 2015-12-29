@@ -1,5 +1,5 @@
 /*
-* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions 
+* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
 * limitations under the License.
 */
 
-package com.keysolutions.ddpclient;
+package ddpclient;
+
+import java.util.HashMap;
 
 /**
- * For sending Meteor a username/password for authentication
+ * Base class for Meteor auth formats that need a password
  * @author kenyee
  */
-public class EmailAuth extends PasswordAuth
-{
-    public EmailAuth(String email, String pw) {
-        super(pw);
-        assert(email != null);
-        this.user.put("email", email);
+public class PasswordAuth {
+    String password;
+    HashMap<String,String> user = new HashMap<String,String>();
+
+    PasswordAuth(String pw) {
+        this.password = pw;
     }
 }

@@ -1,5 +1,5 @@
 /*
-* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions 
+* (c)Copyright 2013-2014 Ken Yee, KEY Enterprise Solutions
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package com.keysolutions.ddpclient;
+package ddpclient;
 
 import java.util.Map;
 
@@ -28,26 +28,26 @@ public class DDPListener {
      * @param resultFields returned results from method call
      */
     public void onResult(Map<String, Object> resultFields) {}
-    
+
     /**
      * Callback for method's "updated" event
      * @param callId method call ID
      */
     public void onUpdated(String callId) {}
-    
+
     /**
      * Callback for method's "ready" event (for subscriptions)
      * @param callId method call ID
      */
     public void onReady(String callId) {}
-    
+
     /**
      * Callback for invalid subscription name errors
      * @param callId method call ID
      * @param errorFields fields holding error info
      */
     public void onNoSub(String callId, Map<String, Object> errorFields) {}
-    
+
     /**
      * Callback for receiving a Pong back from the server
      * @param pingId ping ID (mandatory)
