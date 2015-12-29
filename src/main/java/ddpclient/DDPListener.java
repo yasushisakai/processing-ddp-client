@@ -16,6 +16,7 @@
 
 package ddpclient;
 
+import processing.core.*;
 import java.util.Map;
 
 /**
@@ -23,6 +24,12 @@ import java.util.Map;
  * @author kenyee
  */
 public class DDPListener {
+    public PApplet parent;
+
+    public DDPListener(PApplet parent){
+      this.parent = parent;
+    }
+
     /**
      * Callback for method call with all result fields
      * @param resultFields returned results from method call

@@ -117,6 +117,8 @@ public class DDPClient extends Observable {
     private boolean mConnectionStarted;
     /** Google GSON object */
     private final Gson mGson;
+    /** PApplet parent*/
+    public PApplet parent;
 
     /**
      * Instantiates a Meteor DDP client for the Meteor server located at the
@@ -130,8 +132,9 @@ public class DDPClient extends Observable {
      * @param gson A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort, boolean useSSL, Gson gson)
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, boolean useSSL, Gson gson)
             throws URISyntaxException {
+        this.parent = parent;
         mGson = gson;
         initWebsocket(meteorServerIp, meteorServerPort, useSSL);
     }
@@ -147,9 +150,9 @@ public class DDPClient extends Observable {
      * @param useSSL Whether to use SSL for websocket encryption
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort, boolean useSSL)
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, boolean useSSL)
       throws URISyntaxException {
-        this(meteorServerIp, meteorServerPort, useSSL, new Gson());
+        this(parent,meteorServerIp, meteorServerPort, useSSL, new Gson());
     }
 
     /**
@@ -164,8 +167,9 @@ public class DDPClient extends Observable {
      * @param gson A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers, Gson gson)
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers, Gson gson)
             throws URISyntaxException {
+        this.parent = parent;
         mGson = gson;
         initWebsocket(meteorServerIp, meteorServerPort, trustManagers);
     }
@@ -181,9 +185,9 @@ public class DDPClient extends Observable {
      * @param trustManagers Explicitly defined trust managers, if null no SSL encryption would be used.
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers)
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers)
       throws URISyntaxException {
-        this(meteorServerIp, meteorServerPort, trustManagers, new Gson());
+        this(parent,meteorServerIp, meteorServerPort, trustManagers, new Gson());
     }
 
     /**
@@ -200,9 +204,9 @@ public class DDPClient extends Observable {
      *            - A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort, Gson gson)
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, Gson gson)
             throws URISyntaxException {
-        this(meteorServerIp, meteorServerPort, false, gson);
+        this(parent,meteorServerIp, meteorServerPort, false, gson);
     }
 
     /**
@@ -217,9 +221,9 @@ public class DDPClient extends Observable {
      *            - Port of Meteor server, if left null it will default to 3000
      * @throws URISyntaxException URI error
      */
-    public DDPClient(String meteorServerIp, Integer meteorServerPort)
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort)
       throws URISyntaxException {
-        this(meteorServerIp, meteorServerPort, false);
+        this(parent,meteorServerIp, meteorServerPort, false);
     }
 
     /**
@@ -240,9 +244,9 @@ public class DDPClient extends Observable {
                 trustManagerFactory.init(trustKeystore);
                 trustManagers = trustManagerFactory.getTrustManagers();
             } catch (KeyStoreException e) {
-                System.out.println("Error accessing Java default cacerts keystore. "+ e.getMessage());
+                parent.println("Error accessing Java default cacerts keystore. "+ e.getMessage());
             } catch (NoSuchAlgorithmException e) {
-                System.out.println("Error accessing Java default trustmanager algorithms. "+e.getMessage());
+                parent.println("Error accessing Java default trustmanager algorithms. "+e.getMessage());
             }
         }
 
@@ -285,9 +289,9 @@ public class DDPClient extends Observable {
                 // now we can set the web service client to use this SSL context
                 mWsClient.setWebSocketFactory( new DefaultSSLWebSocketClientFactory( sslContext ) );
             } catch (NoSuchAlgorithmException e) {
-                System.out.println("Error accessing Java default trustmanager algorithms. "+e.getMessage());
+                parent.println("Error accessing Java default trustmanager algorithms. "+e.getMessage());
             } catch (KeyManagementException e) {
-                System.out.println("Error accessing Java default cacert keys. "+e.getMessage());
+                parent.println("Error accessing Java default cacert keys. "+e.getMessage());
             }
         }
     }
@@ -329,7 +333,7 @@ public class DDPClient extends Observable {
      * confirmation message to the Meteor server.
      */
     private void connectionOpened() {
-        System.out.println("WebSocket connection opened");
+        parent.println("WebSocket connection opened");
         // reply to Meteor server with connection confirmation message ({"msg":
         // "connect"})
         Map<String, Object> connectMsg = new HashMap<String, Object>();
@@ -353,7 +357,7 @@ public class DDPClient extends Observable {
         // changed formatting to always return a JSON object
         String closeMsg = "{\"msg\":\"closed\",\"code\":\"" + code
                 + "\",\"reason\":\"" + reason + "\",\"remote\":" + remote + "}";
-        System.out.println(closeMsg);
+        parent.println(closeMsg);
         received(closeMsg);
     }
 
@@ -370,7 +374,7 @@ public class DDPClient extends Observable {
         }
         String errorMsg = "{\"msg\":\"error\",\"source\":\"WebSocketClient\",\"errormsg\":\""
                 + errmsg + "\"}";
-        System.out.println(errorMsg);
+        parent.println(errorMsg);
         // ex.printStackTrace();
         received(errorMsg);
     }
@@ -635,7 +639,7 @@ public class DDPClient extends Observable {
      */
     public void send(Map<String, Object> msgParams) {
         String json = mGson.toJson(msgParams);
-        System.out.println("Sending " + json);
+        parent.println("Sending " + json);
         try {
         this.mWsClient.send(json);
         } catch (WebsocketNotConnectedException ex) {
@@ -735,5 +739,13 @@ public class DDPClient extends Observable {
      */
     public CONNSTATE getState() {
         return mConnState;
+    }
+
+    /**
+    * Processing function, called when the sketch shuts down
+    *
+    */
+    public void dispose(){
+      this.disconnect();
     }
 }

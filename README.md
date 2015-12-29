@@ -4,13 +4,14 @@ Meteor.js Processing(Java) DDP Client
 Origins/Acknowledgements
 ------------------------
 This is a fork from [Ken Yees' Meteor.js Java DDP Client](https://github.com/kenyee/java-ddp-client) which was a
-fairly big fleshing out fork of [Peter Kutrumbos' 
+fairly big fleshing out fork of [Peter Kutrumbos'
 DDP Client](https://github.com/kutrumbo/java-ddp-client).
 
 
 the only Differences is:
-* stopped using Junit testing and slf4j logging for the intention of simple use in processing. 
+* stopped using Junit testing and slf4j logging for the intention of simple use in processing.
 * make a familiar library file structure for processing users
+* has a PApplet parent like other libraries
 
 Usage
 -----
@@ -19,14 +20,14 @@ Usage
 
 Design
 ------
-The Map&lt;String,Object> data type is used extensively; this is an interface 
-so a ConcurrentHashMap or LinkedHashmap is used underneath.  It's a reasonable Java 
-analogue to Javascripts's associative arrays.  Google's GSON library is used to convert 
+The Map&lt;String,Object> data type is used extensively; this is an interface
+so a ConcurrentHashMap or LinkedHashmap is used underneath.  It's a reasonable Java
+analogue to Javascripts's associative arrays.  Google's GSON library is used to convert
 JSON to maps and ArrayLists (used for arrays of strings or objects).  
 
-One important thing to note is that integer values are always represented as 
-Doubles in JSON so that's how they're translated by the GSON library.  If you're 
-sending numbers to Meteor, note that they will be sent as Doubles and what 
+One important thing to note is that integer values are always represented as
+Doubles in JSON so that's how they're translated by the GSON library.  If you're
+sending numbers to Meteor, note that they will be sent as Doubles and what
 you get back from Meteor as numbers show up as Doubles.  This isn't an issue in
 Javascript because it will autoconvert objects to the needed datatype, but Java
 is strongly typed, so you have to do the conversions yourself.
@@ -57,3 +58,6 @@ This library currently supports DDP Protocol 1 (previous version supported pre1)
 How to build(if you ever want to)
 --------------
 
+TODO
+--------------
+try authentication
