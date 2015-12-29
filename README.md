@@ -1,6 +1,8 @@
 Meteor.js Processing(Java) DDP Client
 =========================
 
+[Download zip](https://github.com/yasushisakai/processing-ddp-client/releases/download/v0.0.1-beta.1/ddpclient.zip)
+
 Origins/Acknowledgements
 ------------------------
 This is a fork from [Ken Yees' Meteor.js Java DDP Client](https://github.com/kenyee/java-ddp-client) which was a
