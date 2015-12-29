@@ -12,6 +12,14 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
+*
+* Modifications Copyright (C) 2015 Yasushi Sakai
+* Modifications based upon the usage inside a Processing sketch
+* - changed package name
+* - added member PApplet variable
+* - deleted slf4j Logging, and use println for inspection
+* - deleted JUnit test
+* - added functions dispose
 */
 
 package ddpclient;
