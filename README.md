@@ -5,7 +5,7 @@ Meteor.js Processing(Java) DDP Client
 
 Origins/Acknowledgements
 ------------------------
-This is a fork from [Ken Yees' Meteor.js Java DDP Client](https://github.com/kenyee/java-ddp-client) which was a
+This is a fork from [Ken Yees' Meteor.js Java DDP Client](https://github.com/kenyee/java-ddp-client) which seems to be a
 fairly big fleshing out fork of [Peter Kutrumbos'
 DDP Client](https://github.com/kutrumbo/java-ddp-client).
 
