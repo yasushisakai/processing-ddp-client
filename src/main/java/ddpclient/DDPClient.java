@@ -14,12 +14,14 @@
 * limitations under the License.
 *
 * Modifications Copyright (C) 2015 Yasushi Sakai
-* Modifications based upon the usage inside a Processing sketch
+* changes based upon the usage inside a Processing sketch
 * - changed package name
 * - added member PApplet variable
 * - deleted slf4j Logging, and use println for inspection
 * - deleted JUnit test
 * - added functions dispose
+* - included 'connect' to constructor, because almost every time its used,
+* it will connect right after.
 */
 
 package ddpclient;
@@ -125,8 +127,12 @@ public class DDPClient extends Observable {
     private boolean mConnectionStarted;
     /** Google GSON object */
     private final Gson mGson;
-    /** PApplet parent*/
-    public PApplet parent;
+    /** parent PApplet for Processing*/
+    private PApplet parent;
+    /** whether to print "Sending" and "Recieved" */
+    private boolean isDebug;
+    /** Processing 'delay' time for server communication*/
+    private static int processing_delay = 500;
 
     /**
      * Instantiates a Meteor DDP client for the Meteor server located at the
@@ -144,7 +150,11 @@ public class DDPClient extends Observable {
             throws URISyntaxException {
         this.parent = parent;
         mGson = gson;
+        isDebug = false;
         initWebsocket(meteorServerIp, meteorServerPort, useSSL);
+        parent.registerMethod("dispose",this);
+
+        connect();
     }
 
     /**
@@ -179,7 +189,11 @@ public class DDPClient extends Observable {
             throws URISyntaxException {
         this.parent = parent;
         mGson = gson;
+        isDebug = false;
         initWebsocket(meteorServerIp, meteorServerPort, trustManagers);
+        parent.registerMethod("dispose",this);
+
+        connect();
     }
 
     /**
@@ -286,7 +300,7 @@ public class DDPClient extends Observable {
 
     /**
      * initializes WS client's trust managers
-     * @param trustManagers
+     *
      */
     private void initWsClientSSL() {
         if (mTrustManagers != null) {
@@ -341,7 +355,7 @@ public class DDPClient extends Observable {
      * confirmation message to the Meteor server.
      */
     private void connectionOpened() {
-        parent.println("WebSocket connection opened");
+        parent.println("** WebSocket connection opened **");
         // reply to Meteor server with connection confirmation message ({"msg":
         // "connect"})
         Map<String, Object> connectMsg = new HashMap<String, Object>();
@@ -400,7 +414,7 @@ public class DDPClient extends Observable {
     /**
      * Registers a client DDP command results callback listener
      *
-     * @param DDP command results callback
+     * @param resultListener command results callback
      * @return ID for next command
      */
     private int addCommmand(DDPListener resultListener) {
@@ -430,6 +444,9 @@ public class DDPClient extends Observable {
             this.mWsClient.connect();
             mConnectionStarted = true;
         }
+
+        // stop processing and make it wait
+        parent.delay(processing_delay);
     }
 
     /**
@@ -462,6 +479,9 @@ public class DDPClient extends Observable {
                                             */);
         callMsg.put(DdpMessageField.ID, Integer.toString(id));
         send(callMsg);
+
+        parent.delay(processing_delay);
+
         return id;
     }
 
@@ -497,6 +517,9 @@ public class DDPClient extends Observable {
                                             */);
         subMsg.put(DdpMessageField.ID, Integer.toString(id));
         send(subMsg);
+
+        parent.delay(processing_delay);
+
         return id;
     }
 
@@ -641,13 +664,20 @@ public class DDPClient extends Observable {
     }
 
     /**
+     * Toggles println of "Sending ..." and "Received response: ..."
+     */
+    public void toggleDebug(){
+       isDebug = !isDebug;
+    }
+
+    /**
      * Converts DDP-formatted message to JSON and sends over web-socket
      *
      * @param msgParams parameters for DDP msg
      */
     public void send(Map<String, Object> msgParams) {
         String json = mGson.toJson(msgParams);
-        parent.println("Sending " + json);
+        if(isDebug) parent.println("Sending " + json);
         try {
         this.mWsClient.send(json);
         } catch (WebsocketNotConnectedException ex) {
@@ -664,7 +694,7 @@ public class DDPClient extends Observable {
      */
     @SuppressWarnings("unchecked")
     public void received(String msg) {
-         /*System.out.println*/System.out.println("Received response: "+ msg);
+        if(isDebug) parent.println("Received response: "+ msg);
         this.setChanged();
         // generic object deserialization is from
         // http://programmerbruce.blogspot.com/2011/06/gson-v-jackson.html
@@ -750,8 +780,25 @@ public class DDPClient extends Observable {
     }
 
     /**
+     * Getter for PApplet
+     */
+    public PApplet getParent(){
+        return parent;
+    }
+
+    public void setProcessing_delay(int processing_delay){
+        if(10>processing_delay){
+            parent.println("server needs a few more delay time to respond");
+            parent.println("setting delay to default(500).");
+            DDPClient.processing_delay = 500;
+        }else{
+            DDPClient.processing_delay = processing_delay;
+        }
+    }
+
+    /**
     * Processing function, called when the sketch shuts down
-    *
+    *　ensure this disconnects from the meteor server.
     */
     public void dispose(){
       this.disconnect();

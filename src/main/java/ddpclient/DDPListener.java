@@ -32,7 +32,7 @@ import java.util.Map;
  * @author kenyee
  */
 public class DDPListener {
-    public PApplet parent;
+    protected PApplet parent;
 
     public DDPListener(PApplet parent){
       this.parent = parent;
@@ -68,4 +68,12 @@ public class DDPListener {
      * @param pingId ping ID (mandatory)
      */
     public void onPong(String pingId) {}
+
+    /**
+     * Getter for PApplet parent
+     * @return parent the parent PApplet
+     */
+    public PApplet getParent(){
+        return parent;
+    }
 }
