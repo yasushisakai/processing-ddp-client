@@ -7,7 +7,7 @@ to get the whole repository.
 
 This library was forked from [Ken Yee's Java-DDP implementation](https://github.com/kenyee/java-ddp-client).
 
-[Download zip](https://github.com/yasushisakai/processing-ddp-client/releases/download/v0.0.1-beta.1/ddpclient.zip) *build instructions below*
+[Download zip](https://github.com/yasushisakai/processing-ddp-client/releases/download/v0.0.2/ddpclient.zip) *build instructions below*
 
 1. Installation
 -----
