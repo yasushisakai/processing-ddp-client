@@ -155,4 +155,3 @@ I'm using Gradle to build the target jar file. If you ever wish to do so, instal
 7. TODO
 --------------
 * make processing 3 version
-* try authentication
