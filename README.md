@@ -20,7 +20,7 @@ Get the jar files ([websocket](http://central.maven.org/maven2/org/java-websocke
 ### 1-2. Clean and Preferred??
 also get each of the jar files ([websocket](http://central.maven.org/maven2/org/java-websocket/Java-WebSocket/1.3.0/Java-WebSocket-1.3.0.jar),[gson](http://central.maven.org/maven2/com/google/code/gson/gson/2.5/gson-2.5.jar)) and rename them only using letters and numbers. Save them in a directory that Processing likes to read as a library. (*your_sketchbook_directory/libraries/{{library_name}}/library/{{library_name}}.jar*)
 
-after having those two, extract the [.zip file](https://github.com/yasushisakai/processing-ddp-client/releases/download/v0.0.1-beta.1/ddpclient.zip) and put it inside your sketchbook libraries directory.
+after having those two, extract the [ddpclient.zip file in Releases](https://github.com/yasushisakai/processing-ddp-client/releases) and put it inside your sketchbook libraries directory.
 
 2. (Example)Usage
 -------
