@@ -132,7 +132,7 @@ public class DDPClient extends Observable {
     /** whether to print "Sending" and "Recieved" */
     private boolean isDebug;
     /** Processing 'delay' time for server communication*/
-    private static int processing_delay = 500;
+    private static int processing_delay = 500; // 0.5 seconds
 
     /**
      * Instantiates a Meteor DDP client for the Meteor server located at the
@@ -146,12 +146,17 @@ public class DDPClient extends Observable {
      * @param gson A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
-    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, boolean useSSL, Gson gson)
-            throws URISyntaxException {
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, boolean useSSL, Gson gson){
         this.parent = parent;
         mGson = gson;
         isDebug = false;
-        initWebsocket(meteorServerIp, meteorServerPort, useSSL);
+
+        try {
+            initWebsocket(meteorServerIp, meteorServerPort, useSSL);
+        }catch (URISyntaxException e){
+            parent.println(e.getReason());
+        }
+
         parent.registerMethod("dispose",this);
 
         connect();
@@ -168,8 +173,7 @@ public class DDPClient extends Observable {
      * @param useSSL Whether to use SSL for websocket encryption
      * @throws URISyntaxException URI error
      */
-    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, boolean useSSL)
-      throws URISyntaxException {
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, boolean useSSL) {
         this(parent,meteorServerIp, meteorServerPort, useSSL, new Gson());
     }
 
@@ -185,12 +189,15 @@ public class DDPClient extends Observable {
      * @param gson A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
-    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers, Gson gson)
-            throws URISyntaxException {
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers, Gson gson){
         this.parent = parent;
         mGson = gson;
         isDebug = false;
-        initWebsocket(meteorServerIp, meteorServerPort, trustManagers);
+        try {
+            initWebsocket(meteorServerIp, meteorServerPort, trustManagers);
+        }catch (URISyntaxException e){
+            parent.println(e.getReason());
+        }
         parent.registerMethod("dispose",this);
 
         connect();
@@ -207,8 +214,7 @@ public class DDPClient extends Observable {
      * @param trustManagers Explicitly defined trust managers, if null no SSL encryption would be used.
      * @throws URISyntaxException URI error
      */
-    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers)
-      throws URISyntaxException {
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, TrustManager[] trustManagers){
         this(parent,meteorServerIp, meteorServerPort, trustManagers, new Gson());
     }
 
@@ -226,8 +232,7 @@ public class DDPClient extends Observable {
      *            - A custom Gson instance to use for serialization
      * @throws URISyntaxException URI error
      */
-    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, Gson gson)
-            throws URISyntaxException {
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort, Gson gson){
         this(parent,meteorServerIp, meteorServerPort, false, gson);
     }
 
@@ -243,8 +248,7 @@ public class DDPClient extends Observable {
      *            - Port of Meteor server, if left null it will default to 3000
      * @throws URISyntaxException URI error
      */
-    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort)
-      throws URISyntaxException {
+    public DDPClient(PApplet parent,String meteorServerIp, Integer meteorServerPort){
         this(parent,meteorServerIp, meteorServerPort, false);
     }
 

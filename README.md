@@ -55,11 +55,9 @@ import ddpclient.DDPClient;
 DDPClient client;
 
 void setup(){
-	try{
-	client = new DDPClient(this,"localhost",3000); // connects to localhost:3000
-	}catch(URISyntaxException e){
-		println(e.getReason());
-	}
+	// initialization connects to the server.
+	client = new DDPClient(this, "localhost", 3000);
+	//client = new DDPClient(this, "yourdomain.com", 80); //remote
 }
 ```
 #### 2-2-2. Calling a Meteor.method from sketch
@@ -80,15 +78,12 @@ DDPClient client;
 DDPObserver observer;
 
 void setup(){
-	try{
-		client = new DDPClient(this,"localhost",3000);
-		observer = new DDPObserver(this);
-		client.addObserver(observer);
-	}catch(URISyntaxException e){
-		println(e.getReason());
-	}
 
-	client.connect();
+	client = new DDPClient(this,"localhost",3000);
+	observer = new DDPObserver(this);
+	client.addObserver(observer);
+
+	// a empty arg = new Object[]{}
 	client.subscribe("data",new Object[]{},observer);
 }
 ```
